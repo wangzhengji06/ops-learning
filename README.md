@@ -1,0 +1,3 @@
+# Ops Learning Log
+
+Attempt to learn linux and stuff...
