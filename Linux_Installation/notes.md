@@ -78,6 +78,8 @@ useradd / useradd -m
 Delete:
 userdel / userdel -r
 
+Management:
+chage
 
 # SHELL
 env | grep SHELL

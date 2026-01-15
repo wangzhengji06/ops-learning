@@ -20,3 +20,15 @@ Attempt to learn linux and stuff...
 * Hostname / IPV4 address 
 
 * TTY / User / SHELL / Command
+
+## 2. File System
+
+* stat to check
+
+* inode, softlink, hardlink
+
+* IO redirect
+
+* user, group
+
+* chown, chmod
