@@ -32,3 +32,8 @@ Attempt to learn linux and stuff...
 * user, group
 
 * chown, chmod
+
+* cut find xargs sort uniq
+
+* grep sed awk
+
