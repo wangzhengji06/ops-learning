@@ -2,7 +2,6 @@
 
 #!/bin/bash -> force the shell to be this
 
-
 bin/bash file.sh
 
 ./file.sh
@@ -143,3 +142,74 @@ case "variable_name" in
   "yy")
     do operation 2;;
 esac
+
+
+## loop
+
+while: I will do xxx when xxx
+
+until: I will do xxx when not xxx
+
+
+```bash
+num=1
+until/while [ condition ]
+do 
+  execution body
+done
+
+```
+
+```bash
+for i in list
+do
+  execution body
+done
+```
+
+## loop control
+
+continue
+
+break
+
+exit
+
+## function
+```bash
+func(){
+execution body
+}
+```
+
+Function passes the parameters in the same way the script does. This causes a lot of confusion. 
+
+To make your code clean, use `xx=$1` in the begining of the script.
+
+Scope: by default, bash allows you to change nonlocal vairable and make reference to it directly
+
+To decalre some variable is local variable, you need to use `local xx`
+
+`$?` represents the exit satus.
+
+`return`: customized exit status, from 0 - 255.
+
+A common workflow is, you echo something at the end of the function, then use $() for variable to pass the reference.
+
+## Automation of script
+
+1. `read -p` for user interaction
+2. Use logic and function for sequnetial execution
+3. signal
+
+
+## Expect
+`/usr/bin/expect <<-EOF` 
+
+
+## SSH
+1. Genearte private key & public key(lock)
+2. copy the public key to the remote host
+
+
+

@@ -71,6 +71,14 @@ Attempt to learn linux and stuff...
 
 * If condition
 
+* for while until
+
+* continue break exit
+
+* function
+
+* expect, kill, trap
+
 ## 7. Process
 
 * pstree, vmstat, iostat, top, ps
@@ -90,8 +98,24 @@ Attempt to learn linux and stuff...
 
 * osi, tcp/ip
 
-* tcp port udp
+* tcp port udp 
 
 * ipv4 ipv6 arp icmp
 
 * MAC table
+
+* hostname / hostnamectl
+
+* ifconfig / ip addr
+
+* ifconfig / ip link
+
+* route / ip route
+
+* nmcli 
+
+* bounding / teaming
+
+* ping / fping / route -n / ip route list / traceroute / tracepath / mtr
+
+* tcpdump
