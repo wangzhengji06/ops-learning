@@ -12,12 +12,15 @@ Virtual Disk: VDX
 fdisk -l 
 
 * df - partition / file
+
 df -h / df -T
 
 * du - folder storage
+
 du -h / du -s
 
 dd - customize file for test
+
 if source / of output / bs unit / count number / skip the part I need to ignore / seek the part I need to ignore / conv: overlap or insert?
 
 * lsblk - device itself
@@ -63,6 +66,7 @@ mount -a
 
 ## SWAP
 permanent ban / temporary ban
+
 How? comment /etc/fstab
 
 swapoff -a / swapon -a

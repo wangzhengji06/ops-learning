@@ -119,3 +119,26 @@ Attempt to learn linux and stuff...
 * ping / fping / route -n / ip route list / traceroute / tracepath / mtr
 
 * tcpdump
+
+## 9.Linux server startup process
+
+* The Linux boot process starts with hardware initialization (BIOS/UEFI), hands over control to the bootloader (GRUB) to load the kernel (vmlinuz), which then spawns the first process (systemd) to manage services and finally runs custom scripts (rc.local) before the login shell.
+
+
+## 10. DNS(Network)
+
+* Domain -> IP address
+* ipv4 root  13 group    ipv6 root 25 group
+* Setup dns server: 1. Change zone file 2. Change record file 3. Check grammar 4. load the configureation 5. dig
+* DNS location assignment: /etc/resolv.conf /etc/hosts
+* resolvctl statistics
+* master-slave dns, reverse dns lookup
+* cdn
+
+## 11. Network Security
+
+* asymmetric, symmetric, hashing
+* CA certificate [establish, self-issue, server request, CA issue certificate ]
+* SSL/TLS + HTTP = HTTPS
+* ssh root@10.0.0.3 command
+* scp [-r] source target
