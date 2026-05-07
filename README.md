@@ -138,7 +138,33 @@ Attempt to learn linux and stuff...
 ## 11. Network Security
 
 * asymmetric, symmetric, hashing
+
 * CA certificate [establish, self-issue, server request, CA issue certificate ]
+
 * SSL/TLS + HTTP = HTTPS
+
 * ssh root@10.0.0.3 command
+
 * scp [-r] source target
+
+* ssh without password
+
+* chrony service
+
+* iptables for firewall management
+
+* iptables on ip forwarding
+
+* rsyslog, journaltctl -xeu
+
+* NFS: exportfs, showmount
+
+* rsync: inotify or  sersync
+
+  
+
+## 12.  HTTP and Nginx
+
+* httpd protocol
+* apache, tomcat, nginx
+* io model: 

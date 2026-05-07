@@ -148,7 +148,7 @@ openssl ca -in /data/test.csr -out certs/test.crt -days 365
 
 ```
 
-## SSH
+## ssh
 
 First use asymetric encryption, then use symmetric encryption
 
@@ -160,9 +160,41 @@ A use ssh to connect to B, the command is `ssh [-p 22]`
 
 ![image-20260327194629458](C:\Users\lzabry\AppData\Roaming\Typora\typora-user-images\image-20260327194629458.png)
 
-The final results are, both sides have each other's public key,
+The final results are, both sides have each other's public key.
 
-## SCP
+
+
+## ssh without password
+
+```bash
+sshpass -a 123456 ssh root@10.0.0.13   # Use ssh to connect to remote server without password autehntication
+```
+
+But this is not a good choice.....
+
+```bash
+ssh-copy-id root@10.0.0.13    # I copied the ssh key to 10.0.0.13 server. next time dont ask me the password
+
+```
+
+![image-20260329110747125](C:\Users\lzabry\AppData\Roaming\Typora\typora-user-images\image-20260329110747125.png)
+
+A lot of servers want to connect to each other, then it would be too much to store so many keys.
+
+1. Generate a unified public and private key set
+2. Server connect to itself (172.0.0.1)
+3. scp .ssh
+
+```bash
+ssh-keygen -t rsa # Generate private and public key pair
+ssh-copy-id root@127.0.0.1 # Copied the ssh key to the locahost
+scp -r  .ssh root@10.0.0.13 # Copy the entire ssh setting to another folder
+visudo # Customize the privledge, same as vim /etc/sudoers, setting inside /run/sudo/ts 
+```
+
+
+
+## scp
 
 `scp sourecfile target_location` 
 
@@ -170,4 +202,15 @@ Two kinds:
 
 1. push local file to remote location
 2. pull remote file to local location
+
+## rsync
+
+Compared to `scp`, it will check whether the target location exists or not, and it will also not transport the file again if there is already same file in the target location. Modification to the file will also be recognized and transported.
+
+`rsync -av file root@xxxx` here the `a` stands for maintaining file property 
+
+```bash
+rsync -av data folder     # sync the data folder / file to the target folder
+async -av data/ folder    # sync the files under data folder to the target folder
+```
 
