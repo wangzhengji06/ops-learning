@@ -11,7 +11,7 @@ Attempt to learn linux and stuff...
 
 * Basic Computer Architecture
 
-* API，ABI(POSFIX) 
+* API锛孉BI(POSFIX) 
 
 * snapshot / clone
 
@@ -182,3 +182,5 @@ Attempt to learn linux and stuff...
 * Settings: overall - events - http - server - location
 
 * virtual hosting: port  server name  default_server
+
+* location: root  alias  
