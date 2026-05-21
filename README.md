@@ -182,3 +182,9 @@ Attempt to learn linux and stuff...
 * Settings: overall - events - http - server - location
 
 * virtual hosting: port  server name  default_server
+
+* nginx log, status, redirect,
+
+* nginx reversed proxy: proxy_pass, proxy_set_header, level 4 rewrite
+
+* nginx load balancing 
