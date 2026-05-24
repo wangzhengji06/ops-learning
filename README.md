@@ -166,25 +166,23 @@ Attempt to learn linux and stuff...
 ## 12.  HTTP and Nginx
 
 * httpd protocol
-
 * apache, tomcat, nginx
-
 * io model
-
 * Web, Reverse Proxy, cache, email....
-
 * installation binary/source
-
 * master worker / slave worker
-
 * 3rd party module: donwload module, get same version source code, configure-make, change binary
-
 * Settings: overall - events - http - server - location
-
 * virtual hosting: port  server name  default_server
-
 * nginx log, status, redirect,
-
 * nginx reversed proxy: proxy_pass, proxy_set_header, level 4 rewrite
+* nginx load balancing
 
-* nginx load balancing 
+## 13. Tomcat
+
+* Config: server / service / connector / engine / host[based on server name]
+* Nginx reverse proxy for tomcat, while tomcat host something like jpress
+* port: 8080(to outside), 8005(management), 8009
+
+
+
