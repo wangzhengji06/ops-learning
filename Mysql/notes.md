@@ -303,6 +303,43 @@ Just like sshd represents server and ssh represents client, mysqld represents th
  ```
 
 
+## Sql Commands Knowledge
+
+```sql
+select * from mytable\G
+```
+The above sql allows you to do formalized output in the terminal.
+
+
+```sql
+show create database database1\G
+```
+This can show the query used to create database1.
+
+
+```sql
+alter database db2 character set utf8mb4;
+```
+This can be used to change the character set of a database.
+
+
+### Create Table
+
+How do we create table?
+
+```sql
+create table table_name (
+	column_name type_name other_property,
+	column_name type_name other_property,
+    column_name type_name other_property,
+) table-level property;
+```
+
+## SQL variable
+
+* char(5): Could waste space, but can be reused if you are changing the value
+* varchar(5): Save space, but when it got changed it need rearrangement....
+
 
 
 

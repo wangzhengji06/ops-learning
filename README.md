@@ -190,8 +190,19 @@ Attempt to learn linux and stuff...
 * maven: java packaging tool : mvn clean package
 * maven config: /etc/maven/setting.xml / pom.xml
 * nexus: local repo solution
+* Create self-owned repo using nexus
 
  
+## 14. MySQL
+
+* database structure
+* Relational database
+* database, table, index, user, function, process, view
+* Use binary / source code for single/mutiple instances for mysql/mariadb
+* Final Environment: Client / Server
+* SQL statement: DDL, DCL, DML, DQL, TCL
+* SQL statement format: SELECT / WHERE / FROM / ;\G / 
+* show, create, drop, alter
 
 
 
