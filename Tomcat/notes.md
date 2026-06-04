@@ -413,3 +413,66 @@ server{
 
 ```
 
+## HTTPS Reverse Proxy
+
+First, edit for all the ROOT in difference servers, add test.jsp to it.
+
+```bash
+upstream tomcat{
+  server 10.0.0.13:8080;
+  server 10.0.0.14:8080;
+  server 10.0.0.15:8080;
+}
+
+server{
+ listen 80;
+ server_name sswang.magedu.com;
+ return 302 https://$host$request_uri;
+}
+server{
+ listen 443 ssl;
+ server_name sswang.magedu.com;
+ ssl_certificate /usr/share/easy-rsa/3/pki/sswang.magedu.com.pem;
+ ssl_certificate_key /usr/share/easy-rsa/3/pki/private/sswang.magedu.com.key;
+ ssl_session_cache shared:sslcache:20m;
+ ssl_session_timeout 10m;
+ location ~* \.jsp$ {
+ proxy_pass http://tomcat;
+ proxy_set_header host $http_host;
+ }
+}
+
+```
+
+## Tomcat Session
+
+We have setup a nginx that will pass request to different tomcat server for load balancing. However, https relies on a session ID that is very short-term. 
+
+How to keep the session id?  1. Bind, if a request talk to a server, it will forever talk to that server 2. Duplicate, every server has every session information. This will allow client to connect to random one.   
+
+Please refer to document, it is kind of a lot
+
+## Tomcat + Redis
+
+Check document, it is basically copy and paste. 
+
+
+
+
+
+## Tomcat Performance Optimizaiton
+
+two parts: tomcat optimization / java optimization
+
+The most important part is Garbage Collection. There are two ways to find out...
+
+JVM will group objects into new-born and elderly, and use different GC strategy.
+
+When you do eldery GC, you will gc the youngest, so this is a full GC, a.k.a stop the world.
+
+Tow methods: 1. Make the GC duration very short. 2. Makes the interval between GC very long.
+
+
+
+Both needs JVM parameters.
+

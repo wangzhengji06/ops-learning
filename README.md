@@ -183,6 +183,15 @@ Attempt to learn linux and stuff...
 * Config: server / service / connector / engine / host[based on server name]
 * Nginx reverse proxy for tomcat, while tomcat host something like jpress
 * port: 8080(to outside), 8005(management), 8009
+* Session: bond & share
+* JVM basic:  java -> bytes -> class loader -> jvm
+* heap: young(eden from to) / old
+* jvm parameters: -Xms -Xmx ratio...
+* maven: java packaging tool : mvn clean package
+* maven config: /etc/maven/setting.xml / pom.xml
+* nexus: local repo solution
+
+ 
 
 
 
