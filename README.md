@@ -203,6 +203,10 @@ Attempt to learn linux and stuff...
 * SQL statement: DDL, DCL, DML, DQL, TCL
 * SQL statement format: SELECT / WHERE / FROM / ;\G / 
 * show, create, drop, alter
+* SQL statement
+* User Management
+* Engine, Index
+
 
 
 

@@ -335,13 +335,294 @@ create table table_name (
 ) table-level property;
 ```
 
-## SQL variable
+Or we can copy from a table
+
+```sql 
+Create table xxx like xxx;
+Create table xxx select xxx;
+```
+
+The latter wants the data also!
+
+THe clone does not mean 100% replicate, it might lose some properties like main key etc..
+
+THe `like` method however will copy the whole structure.
+
+### SQL variable
 
 * char(5): Could waste space, but can be reused if you are changing the value
 * varchar(5): Save space, but when it got changed it need rearrangement....
 
+### SQL MOdifier
+
+* AUTO_INCREMENT: Automatically increment the value
+* UNSIGNED: No minus
+
+### Check table
+
+```sql
+show table status like 'tablename'\G
+```
+
+** btw, you should use % instead of * for wildcard in sql **
+
+### Modify table
+
+DDL statements;
+
+```sql
+-- change the table name
+alter table student rename stu;
+
+-- add column after column name
+alter table stu ADD phone varchar(11) AFTER name;
+
+-- delete a column
+alter table stu DROP COLUMN gender;
+
+-- modify a column's category
+alter table stu MODIFY phone int;
+
+-- if you also want to modify the column name;
+alter table stu CHANGE COLUMN phone mobile char(11);
+
+-- Change charset
+alter table stu character SET utf8;
+
+-- Change default value
+alter table stu ADD is_del bool DEFAULT false;
+
+-- Add main key
+ALTER TABLE student2 ADD PRIMARY KEY (name);
+
+-- Remove main key
+ALTER TABLE student2 DROP PRIMARY KEY;
+
+-- Add a int main key 
+ALTER TABLE student2 ADD COLUMN id INT UNSIGNED FIRST;
+ALTER TABLE student2 MODIFY COLUMN id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY;
+
+```
+
+DML statements
+
+```sql
+-- Insert into database table
+insert stu (name,age) values('xiaoming',20);
+
+-- Update data 
+INSERT INTO stu (id,name) VALUES(12,'zhangsan') ON DUPLICATE KEY UPDATE name='zhangsan';
+
+-- Delete data
+delete from stu where id=10;
+
+-- unrestorable delete
+TRUNCATE TABLE tbl_name; 
+```
+
+DQL
+
+```sql
+-- calculatge
+select 1+2+3+4 as 'SUM';
+```
+
+## Advanced Knowledge
+### Storage Process
+
+You can view this as sql's script, you can call it using `call`.
+
+The objective is to simply complete something, just like a funciton.
+
+### Trigger
+
+Cannot be used independently, must ba applied when xx table does xx operation.
+
+```sql
+CREATE TRIGGER trigger_name
+{BEFORE|AFTER} {INSERT|UPDATE|DELETE}
+ON table_name
+FOR EACH ROW
+BEGIN
+	-- trigger logic
+END;
+```
+
+### Event Manager
+Do setup and teardown.
+
+## User Administration
 
 
+Here is mysql's user field:
+mysql created user: `username@allowed_client_ip`
+
+There are 3 level of passwords:
+1. 0 -> as long as password length is 8 it is okay.
+2. 1 -> Uppercase, number, special character at least 3.
+3. 2 -> Avoid common password.
+
+Identity Authentication plugin:
+1. native -> native password plugin
+2. now -> caching_sha2_password   By default, it will enable ssl.
 
 
+Check what is the plugin now:
+```sql
+select plugin from mysql.user;
+```
 
+Connect to mysql:
+```bash
+mysql -u root -p 123456576 -h 10.0.0.16
+```
+
+
+### privilege Practice
+
+```sql
+-- who are the users? what server can use these users to log in?
+select user, host from mysql.user;
+```
+
+Try to connect 
+
+```bash
+mysql -u root -p -h 10.0.0.16
+```
+
+Common errors:
+1. can't connect -> Mysql server does not accept host connection  vim /etc/mysql/server.conf -> change the bind address
+2. is not allowed -> Create an account that allow the client to connect the server. 
+3. TLS/SSL error -> Usually means the password is wrong
+4. show databases, but only see information_schema -> grant user the privilege to manipulate on certain database/table
+
+Create user:
+```sql
+create user root@'10.0.0.%' identified by '12345678';
+```
+
+Grant privilege:
+```sql
+grant all privileges on *.* to root@'10.0.0.%' with grant option;
+```
+
+Revoke privilege:
+```sql
+REVOKE GRANT OPTION ON *.* FROM 'root'@'10.0.0.%'; 
+```
+
+### password Practice
+#### You need to change password.
+
+```sql
+select host,user,authentication_string from mysql.user; --mysql
+select host,user,password,authentication_string from mysql.user; --mariadb
+```
+
+```sql
+-- Create user and password
+create user root@'10.0.0.%' identified by '12345678';
+-- alter user's password
+alter user root@'10.0.0.%' identified by '12345678';
+```
+
+
+#### You forget the password.
+1. Modfiy the server side config, skip authentication
+2. After logging in, reset password
+3. Restore the password.
+
+```bash
+vim /etc/my.cnf
+--skip-grant-tables # SKip so that any user can login without providing password
+--skip-networking # WHen you do all this you do not want outside user to connect
+```
+
+```sql
+flush privileges;
+alter user test@'10.0.0.%' identified by '12345678';
+```
+
+### flush privilege
+
+```sql
+flush privildges;
+```
+
+This is only used when you have modified the existing user's privilege. 
+
+## Mysql Server Performance
+
+### Thread Pool
+mysqlis a single-process application, so it uses multithread, everytime a new connection come, it will get a new thread. Thread pool is useful because setting up new thread is costly usually.
+
+### Storage Engine
+
+```sql
+SHOW ENGINES;
+```
+
+Acutally Innodb is the default. MYISAM used to be the default. 
+
+What difference do them make?
+
+There are table-level locks and row-level locks. When you are using table-level locks, no one else can edit this table. 
+
+MYISAM has this table-level lock, and write / read blocks each other. Innodb on the other hand does row-level, so it is better if you are expected to frequently edit your file.
+
+## Mysql Property and Environment Variable
+
+You can use @ to check session variable and global variable, and @@ to check only global variables.
+
+To set, you use `set @attribute value`, and `set global @attribute value`.
+
+The previous one is just session level, and will become invalid once a new session is initiated.
+
+### Practice for configuring options
+
+```bash
+# To check all options
+mysqld --verbose --help | head -n 20
+
+# print current options
+mysqld --print-default
+
+# Change the config
+vim /usr/local/etc/my.cnf
+# Then you can append to the last row
+
+```
+
+Check inside mysql client
+
+```sql
+show varaibles like 'max_connections%';
+```
+
+```bash
+mysqld --print-default
+```
+
+In mysql config, there is no difference between `_` and `-`.
+
+
+### Practice for setting variables
+
+```sql
+show variables;
+show global variables;
+
+--set global
+set GLOBAL system_var_name = value;
+--or
+SET @@global.system_var_name = value;
+```
+
+## SQL Index
+
+```sql
+show index from db.table;
+
+create index idx_name on table(column);
+```
