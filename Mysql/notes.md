@@ -625,4 +625,295 @@ SET @@global.system_var_name = value;
 show index from db.table;
 
 create index idx_name on table(column);
+
+drop index index_name on student;
 ```
+
+## Concurrency management: Lock and Transaction
+
+Lock: 
+
+Read lock and Write lock.
+
+Read lock allows other read.
+
+Write lock will block all the other oeprations.
+
+An important thing：Modern MVCC will not add read lock when you use select!
+
+```sql
+lock tables student write;
+unlock tables;
+```
+
+Lock is used to protect transaction from conficting.
+
+AICD:
+1. Atomicity
+2. Consistency
+3. Isolation
+4. Durability
+
+The main idea is, for each action, you have a unique number for it, the roll-back version number, 
+
+You group a block of actions as transaction, and when one action fails, you can rollback to the beignning version.
+
+
+So *transaction + lock* are the way sql used to manage the concurrency and manipulation.
+
+
+Some trival details, sometimes full rollback might be too tiring, you can save point. InnoDB supports this also.
+
+ 
+When lock works with transaction, inside the transaction the lock is kept, not released. This is to prevent others from modifying the middle state.
+
+Four levels(the higher the safer, the higher the less efficient):
+1. Read Uncommited
+2. Read Commited: if you are commited, I can saw that in my current transaction
+3. Repetable Read: if you are commited, and I commited, then I can see your update
+4. Serializable: Add read lock. 
+
+
+## SQL Logs
+
+### Transaction Logs
+innodb_flush_log_at_trx_commit controls when InnoDB flushes the redo log from memory to disk. The redo log first resides in the Log Buffer (user space), then is written to the OS Page Cache, and finally persisted to the redo log file on disk through fsync(). With a value of 1 (default), every transaction commit performs both write() and fsync(), providing the strongest durability guarantee. With 2, each commit writes the redo log to the OS buffer, but flushing to disk is delayed and performed approximately once per second, improving performance at the cost of potentially losing up to one second of transactions during a power failure. With 0, both writing and flushing are deferred to a background thread that runs roughly once per second, offering the best performance but risking the loss of up to one second of committed transactions if either MySQL or the host system crashes.
+
+
+### Error Logs
+```bash
+mkdir /data/mysql/logs -p
+chown mysql:mysql -R /data/mysql/logs
+vim /etc/mysql/mariadb.conf.d/50-server.cnf
+log-error=/data/mysql/logs/mysqld.log
+systemctl restart mariadb
+```
+
+### Slow QUery Log
+record any sql that takes more than set time or did not use index;
+### Binary Log
+Also known as update log, when the server crashes, if you have binary log, you can restore the database pretty easily.
+
+```sql
+show variables like "%log%";
+```
+
+```bash
+mysqlbinlog /data/mysql/logs/binlog.000001
+```
+
+How to show binary logs?
+
+```sql
+-- Either one will work!
+show master logs;
+show binary logs;
+```
+
+Everytime you restart the service, the binary log will create a new one.
+
+```sql
+-- Either one will work!
+show master status;
+show binary logs status;
+```
+
+To check what has happened, use the following command:
+
+```sql
+show binlog events\G
+show binlog events in 'binlog.000002'\G  -- exact file
+show binlog events from 1701\G;  -- exact location
+```
+
+Flush logs
+
+```sql
+flush logs;
+```
+
+Clean logs
+
+```sql
+PURGE BINARY LOGS TO 'binlog.000002' --delete every logs before this file
+reset master  --reset all the log files and create only one new file, works for mariadb
+reset binary logs and gtids --this works for mysql
+```
+
+
+## MySQL backup and recovery
+Full backup and Partial Backup. 
+
+Differntial backup: the change since last full backup.
+
+Incremental backup: the change since last backup.
+
+Cold backup: When backing up date, I stop the server so that it is completey the same
+
+Warm backup: do not stop the service, but can only be read, not be written.
+
+Hot backup: the service wont stop, can be written, can be read. Usually happen when you have version control.
+
+Physic backup vs Logical backup: Copy all the files vs generate some sql file to excute.
+
+
+Things need to be backup:
+1. data
+2. Binary log
+3. User account, privilege, view, trigger...
+4. Config file
+
+An importanmt principle is to put the backup file in a different server.
+
+We will specifically talk about mysqldump. 
+
+
+### Cold Backup and recover
+The secnairo is that 10.0.0.13 need cold backup, we will store the backup file in 10.0.0.16.
+
+```bash
+
+# Prepare for the backup on 10.0.0.13
+
+systemctl stop mariadb.service
+
+mkdir /data/backup -p
+
+cd /data/backup
+
+tar zcf base_data.tar.gz /var/lib/mysql # Package the data
+
+tar zcf binlog_data.tar.gz /data/mysql/logs # Package the binlog, which is essential
+
+cp /etc/mysql/mariadb.conf.d/50-server.cnf  ./ # Backup the main config also
+
+scp ./* root@10.0.0.16:/data/backup/   # Transfer the backup file through scp
+
+# Recover everything on 10.0.0.16
+
+cp 50-server.cnf /etc/mysql/mariadb.conf.d/
+
+rm -rf /var/lib/mysql/* # Clean the data
+
+rm -rf /data/mysql/logs/* # Clean all the logs
+
+tar xf base_data.tar.gz
+
+tar xf binlog_data.tar.gz
+
+mv var/lib/mysql/* /var/lib/mysql/ # Move the data to the target server
+
+mv data/mysql/logs/* /data/mysql/logs # Move logs
+
+chown mysql:mysql -R /var/lib/mysql # Make sure the privilege is correct
+
+```
+
+There you go with your cold backup.
+
+
+### MySQLdump: Logical backup
+
+```bash
+#without password
+mysqldump
+
+#with password
+mysqldump -uroot -p123456 -h10.0.0.13
+
+# backup all databases;
+mysqldump -A
+
+# backup named databases only
+mysqldump -B db1, db2
+
+# flush the logs
+mysqldump -F
+
+# Clustering situation
+mysqldump --source-data
+```
+
+Now, lets try a real-world scenario
+
+
+```bash
+mysqldump db1 >db1-bak.sql
+```
+
+```sql
+create database db1;
+```
+
+```bash
+mysql db1 < db1-bak.sql
+```
+
+
+And here is an automatic backup shell script
+```bash
+UNAME=root
+PWD=123456
+HOST=10.0.0.13
+CMD_OPT="-u ${UNAME} -p${PWD}"
+IGNORE='Database|information_schema|performance_schema|sys'
+YMD=`date +%F`
+BACKUP_DIR='/data/backup'
+if [ ! -d ${BACKUP_DIR}/${YMD} ];then
+mkdir -pv ${BACKUP_DIR}/${YMD}
+fi
+DBLIST=`mysql ${CMD_OPT} -e "show databases;" 2>/dev/null | grep -Ewv "$IGNORE"`
+for db in ${DBLIST};do
+mysqldump ${CMD_OPT} -B $db 2>/dev/null 
+1>${BACKUP_DIR}/${YMD}/${db}_${YMD}.sql
+if [ $? -eq 0 ];then
+echo "${db}_${YMD} backup success"
+else
+echo "${db}_${YMD} backup fail"
+fi
+done
+```
+
+
+### master-data / source-data otpion
+
+Inmagine you do the full backup at 9 o'clock in the morning.
+
+At 10 o'clock, someone did something stupid and detele a whole table.
+
+At 11 o'clock, you are asked to recover everything.
+
+What to do?
+
+1. Because you use master-data option, you know what was the last binlog
+```bash
+grep "CHANGE MASTER" /data/backup/db2.sql
+```
+2. Now get all the bin logs after the backup, and *AVOID* the dangerous operation of deleting the whole table.
+```bash
+mysqlbinlog --start-position=9423 mysql-bin.000002 > /backup/incremental_backup_$(date +%Y%m%d).sql
+
+vim incremental_backupxxx.sql # remove the drop part
+```
+3. You have the backup, and the incremnetal log, so scp!
+```sql
+set sql_log_bin = 0; -- do you need these many logs?
+source /root/db2.sql;
+source /root/incremental_backup_20260614.sql
+```
+
+```bash
+mysqldump db2 student > student.sql
+scp student.sql root@10.0.0.13:
+```
+4. Now you can do a full recover
+```sql
+set sql_log_bin=0
+source /root/student.sql
+set sql_log_bin=1
+```
+
+
+
+
+

@@ -206,6 +206,31 @@ Attempt to learn linux and stuff...
 * SQL statement
 * User Management
 * Engine, Index
+* transaction: ACID, repetable read, read uncommited, serialization, dirty read....
+* log: transaction log -> undo / rdo. Error log. General log. Binary log.
+* Backup and Recovery: Physical backup / incremental backup etc...
+* source and replica: how to deploy, master needs an account, and sqldump the data
+* replica needs import data, modify the command, start the replica
+* logic: client changes master, records to binlog
+* replica starts io thread to connect to master
+* master starts the dump thread and goes to binlog pos
+* replica records the data into relay log
+* replica starts sql thread and read commands from relay log and hand it to mysql to execute
+* finally master and slave have the same contentu
+* cluster: binlog + manual / GTID
+* middleware: backend and mysql bridge
+* high availability: MGR clusters
+
+
+
+## 15. LVS
+* Mode: NAT, DR, TUN
+* NAT needs to go through LVS to respond, so it is relatively slow
+* DR changes MAC address RS needs vip
+* TUN use ip-in-ip protocol. RS needs vip and the ability to handle nonstandard packet.
+* ipvsadm command. service use Uppercase Letter, server use Lowercase Letter.
+
+
 
 
 
