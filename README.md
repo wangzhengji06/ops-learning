@@ -216,7 +216,7 @@ Attempt to learn linux and stuff...
 * master starts the dump thread and goes to binlog pos
 * replica records the data into relay log
 * replica starts sql thread and read commands from relay log and hand it to mysql to execute
-* finally master and slave have the same contentu
+* finally master and slave have the same contents
 * cluster: binlog + manual / GTID
 * middleware: backend and mysql bridge
 * high availability: MGR clusters
@@ -229,7 +229,10 @@ Attempt to learn linux and stuff...
 * DR changes MAC address RS needs vip
 * TUN use ip-in-ip protocol. RS needs vip and the ability to handle nonstandard packet.
 * ipvsadm command. service use Uppercase Letter, server use Lowercase Letter.
-
+* vrrp -> high availability, the lvs director needs to check each other whether they are alive or not
+* config: global, high avaialbility, virtual server
+* experiment: keepalived config experiment, 
+* virtual server: real_server many ways to check heartbeat: http, tcp
 
 
 
