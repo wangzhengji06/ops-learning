@@ -90,3 +90,129 @@ Due to mutiple vip shown in lvs servers.
 
 The main reason is: the slave node cannot recieve the message from master node.
 
+## vrrp config
+
+This is the vip part, the so-called high availability
+
+```config
+
+vrrp_instance VI_1 {
+    state MASTER
+    interface ens37
+    virtual_router_id 50
+    priority 100
+    unicast_src_ip 192.168.8.13
+    unicast_peer {
+        192.168.8.16
+    }
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        10.0.0.100 dev ens33 label ens33:1
+    }
+}
+```
+
+This is the virutal server part, the so-called overload balancing part
+
+```config
+virtual_server 10.0.0.100 80 {
+    delay_loop 2
+    lb_algo rr
+    lb_kind DR
+    protocol TCP
+    real_server 10.0.0.14 80 {
+    }
+    real_server 10.0.0.17 80 {
+    }
+}
+```
+
+Under the DR mode, director gets vip's request, and change MAC and transfer to RS, RS's target ip address is still vip, RS needs to set VIP on Io, but RS cannot respond to VIP's ARP request. Therefore, we need to set `arp_ignore / arp_announce` 
+
+
+For real server, the nginx or the http service might already be dead.
+
+
+```config
+real_server 10.0.0.14 80 {
+    HTTP_GET {
+        url {
+            path /
+            status_code 200
+        }
+        connect_timeout 3
+        nb_get_retry 3
+        delay_before_retry 3
+    }
+}
+```
+
+
+
+*you can set up sorry server when all real servers related are dead.*
+
+*you can also use wrr to assign weights to real server.*
+
+
+## vrrp heartbeat check
+
+Laster section is talking about the detection of real server. But we need to check master node also. Keepalived is running, but other service is dead or not is unknown.
+
+1. Write checkup script
+2. Keepalived config modified to use that script
+3. Effect check
+
+
+```config
+vrrp_script chk_keepalived {
+    script "检测命令或脚本路径"
+    interval 1
+    weight -30
+    fall 3
+    rise 2
+    timeout 2
+}
+
+vrrp_instance VI_1 {
+    ...
+    track_script {
+        chk_keepalived
+    }
+}
+```
+
+Here master will send to slave its weight, after the failure, master weight will reset to 70, thus triggering the mechanism ot changing the master. 
+
+
+## nginx + keepalived
+
+Use only keepalived, not lvs, and control the two nginx servers.
+
+```bash
+#!/bin/bash
+
+nginx_process_count=$(ps -C nginx --no-header | wc -l)
+
+if [ "$nginx_process_count" -eq 0 ]; then
+    systemctl start nginx
+
+    nginx_process_count=$(ps -C nginx --no-header | wc -l)
+
+    if [ "$nginx_process_count" -eq 0 ]; then
+        systemctl stop keepalived
+    fi
+fi
+```
+
+This is used for vrrp checking. Again, here we need to know whether nginx is really alive or not.
+
+Here the idea is, the keepalived will try to restart the nginx, and if it really cannot be fixed, it will stop keepalived to let the master status be taken. 
+
+
+## HAProxy
+
+Basically completely the same as nginx, the difference here is nginx listens to 0.0.0.0:80, but haproxy can bind to unexisted vip address. When it is a slave, it can still bind to that address. But nginx can also do that. Maybe the point of HAProxy is to provide a good ui.  
+

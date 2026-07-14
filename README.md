@@ -223,18 +223,28 @@ Attempt to learn linux and stuff...
 
 
 
-## 15. LVS
+## 15. LVS + Keepalived
 * Mode: NAT, DR, TUN
 * NAT needs to go through LVS to respond, so it is relatively slow
 * DR changes MAC address RS needs vip
 * TUN use ip-in-ip protocol. RS needs vip and the ability to handle nonstandard packet.
 * ipvsadm command. service use Uppercase Letter, server use Lowercase Letter.
-* vrrp -> high availability, the lvs director needs to check each other whether they are alive or not
-* config: global, high avaialbility, virtual server
-* experiment: keepalived config experiment, 
+* lvs (rs needs vip and arp config for dr mode)
+* clustering basis: time synchornization / vrrp protocol
+* keepalived: high availability + high extension
+* can be used alone or add other high extension software(nginx, HAProxy)
+* keepalived: global / high avalability / high extension
 * virtual server: real_server many ways to check heartbeat: http, tcp
+* keepalived basically allows you to check vrrp's other lvs server state using customized way also
+* keepalived itself vs keepalived + nginx 
+* vrrp scripts + track scripts
 
 
-
-
+## 16.Ansible
+* automatic devops tool[I
+* python + yaml + jinja2
+* config: hosts file + ssh no-password login
+* ansible modules: shell, command, scripts
+* copy, fetch, file, unarchive, archive, get_url module
+* apt, yum, service module
 
