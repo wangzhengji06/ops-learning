@@ -1,0 +1,504 @@
+## Ansible Command Execution Flow
+
+1. Write and run an Ansible ad-hoc command.
+
+2. Load the basic Ansible runtime configuration.
+
+3. Check the inventory file to verify whether the target hosts exist.
+
+   - If the target hosts do not exist, Ansible reports an error.
+   - If the target hosts exist, Ansible starts parsing the command.
+
+4. Parse the command.
+
+   - Load required dependencies and related modules.
+   - Convert the command into a temporary Python script.
+
+5. Connect to the remote hosts through the connection module, usually SSH.
+
+6. Transfer the temporary Python script to the remote hosts.
+
+7. Execute the Python script on the remote hosts.
+
+8. Return the execution result to Ansible.
+
+9. Clean up temporary files after execution.
+
+
+## Ansible important modules
+Paramiko: Used to do ssh connection in python
+
+PyYaml: Allow to read yaml format playbook
+
+Jinja2: Used for template engine
+
+## Ansible basic config structgure
+
+-- global level: /etc/ansible
+
+-- user level: ~/.ansible
+
+-- project level: ./
+
+Priority: project > user > global
+
+## Ansible basic command
+
+```config
+ansible targethost -m module -a "proprty=value1, value2, value3  property=value" # if you do not provide module, the default will be command
+
+ansible-doc [-s] module # what is the document for this module? -s means simple mode
+```
+
+
+Let's try to execute ls command on 10.0.0.13
+
+```bash
+#first add to the host
+vim /etc/ansible/hosts
+
+#second allow the ssh copy without password
+ssh-keygen && ssh-copy-id
+
+#check whether a server can be connected to
+ansible 10.0.0.16 -m ping
+
+# one line output
+ansible xxxx -o   
+
+# Generate example config file
+ansible-config init --disabled > ansible.cfg
+```
+
+Ansible use different colors to assign to command output. Green means command work successfully, yellow means successful run but the content has changed, red means not work. Purple stands for warning. 
+
+how to stop the warning?
+
+1. Inside host files, point out python interpreter -> `10.0.0.13 ansible_python_interpreter=/usr/bin/python3.12`
+2. directly write to ansible -> 
+```
+[defaults]
+deprecation_warnings = False
+interpreter_python = /usr/bin/python3
+```
+
+
+Another thing here, if you use ansible and want to run some sudo commands on other servers, what you can do is change /etc/sudoers and allow no password for sudo commands.
+
+## ansible hosts selection
+There are different formats in host file.
+```config
+# You can write hostname or ip
+## [webservers]
+## beta.example.org
+## 192.168.1.100
+```
+
+There are 3 special properties:
+1. all -> all the hosts inside the host file
+2. ungrouped -> all the hosts that are not under some groups
+3. localhost -> this server.
+
+In general, ansibel command usually either calls a group, or call ip / hostname, very rare case it would call all. 
+
+
+There are some grammar that allows you select the hosts more effectively
+
+```
+all -> all the hosts
+regular expression -> *
+logical or -> :
+logical and -> :&
+logical not -> :!
+
+```
+
+
+The above commands are all valid
+
+```bash
+118  ansible web -m ping -o
+119  ansible 'web:mysql' -m ping -o
+120  ansible 'web:&mysql' -m ping -o
+122  ansible 'web:!mysql' -m ping -o
+123  clear
+124  ansible all -m ping -o
+125  ansible '*' -m ping -o
+126  ansible '10.0.0.*' -m ping -o
+```
+
+
+
+## ansible modules
+
+1. command: can execute some basic linux commands, does not support pipeline. Does not support special character.
+2. shell: can exucte more linux commands.
+3. scripts: used to execute script. 
+
+
+You can change the default module from command to shell
+
+```config
+[defaults]
+module_name=shell
+```
+
+
+### hostname
+Use the following command to change the hostname of 10.0.0.12 to rocky-12
+```bash
+ansible 10.0.0.12 -m hostname -a "name=rocky-12"
+```
+
+
+### user
+Used to add user to the system
+```bash
+ansible 10.0.0.16 -m user -a "name=webapp system=yes groups=root,bin uid=10086 comment='webapp' shell=/sbin/nologin home=/tmp/webapp state=present"
+```
+
+Used to delete a user from the system
+```bash
+ansible 10.0.0.16 -m user -a "name=webapp state=absent"
+```
+
+Here the state property is very important. if it is related to creation, it is present, else it is absent.
+
+### group
+Used to create group
+```bash
+ansible 10.0.0.16 -m group -a "name=webapp system=yes gid=10086 state=present"
+```
+
+Remove group
+```bash
+ansible 10.0.0.16 -m group -a "name=webapp system=yes gid=10086 state=absent"
+```
+
+### setup
+Used to collect information from the host, you can use filter keyword to get only the properties you want
+```bash
+ ansible 10.0.0.16 -m setup -a "filter=ansible_user_dir"
+```
+
+
+### copy
+Copy a local file to a remote server, you can use 111 to control the privilege
+```bash
+ansible 10.0.0.16 -m copy -a "src=/tmp/script.sh owner=lzabry group=lzabry mode=111 dest=/tmp/tpircs.sh"
+
+#you can use backup=yes to prevent overwritting the existing file in the destination location
+```
+
+
+### fetch
+Get the file on the remote server.
+```bash
+ansible 10.0.0.12 -m fetch -a "src=/tmp/tpircs.sh dest=/tmp"
+```
+
+### file
+Used to do all the files-related stuff
+```bash
+ansible 10.0.0.16 -m file -a "path=/file/ state=directory" #create directory
+ansible 10.0.0.16 -m file -a "path=/file/ state=absent" #remove directory
+```
+
+### archive
+Not only transfer, but also unarchive
+```bash
+ansible 10.0.0.16 -m unarchive -a "src=/root/passwd.tar.gz dest=/tmp/passwd"
+```
+
+
+### lineinfile
+Change single line for fail
+```bash
+ansible 10.0.0.16 -m lineinfile -a "path=/tmp/nginx_test.conf regexp='8080' line='90' "
+```
+
+### replace
+Used to be sed function
+```bash
+ansible 10.0.0.16 -m replace -a "path=/tmp/fstab regexp='(defau.*)' replace='#\1'" # add # for all the default
+```
+
+
+### apt/yum
+Used to install and uninstall software
+```bash
+ansible 10.0.0.16 -m apt -a "name=nginx,redis state=present"
+```
+
+You can remove the config file etc also by making purge = yes
+
+```bash
+ansible 10.0.0.16 -m apt -a "name=nginx,redis state=absent purge=yes autoremove=yes"
+```
+
+### service
+Used to enable and disable service
+```bash
+ansible 10.0.0.16 -m service -a "name=nginx enabled=false"
+```
+
+You can also restart a service
+```bash
+ansible 10.0.0.16 -m service -a "name=nginx state=restarted"
+ansible 10.0.0.16 -m service -a "name=nginx state=reloaded"
+ansible 10.0.0.16 -m service -a "name=nginx state=stopped"
+ansible 10.0.0.16 -m service -a "name=nginx state=started"
+```
+
+
+## ansible playbook
+
+playbook manages the action of module into task. name: module name; 
+
+The basic format looks like this
+
+```
+- hosts: 10.0.0.13
+  remote_user: root
+  tasks:
+  - name: hello world
+    command: echo "hello world!"
+	tags:
+	- hello world
+  -name: extra vars
+   debug: msg-{{ extra_vars }}
+```
+
+
+Ansible playbook has mainly 4 sections:
+1. target
+2. variable -> the variables that are needed for the task
+3. task
+4. handler -> relationship between tasks
+
+The benefits of ansible is that running one-command has the same effect as running that command multiple times, because it will do some checking ,this is better compared to shell script.
+
+
+## YAML basic
+
+* Sensitive to uppercase
+* Use indentation
+
+
+Use case: install httpd, make sure it is enabled as a service. Use yaml
+
+First we know that, the following ansible commands would work
+
+```bash
+#ubuntu
+ansible xxx -m apt -a "name=httpd state=present"
+
+#rocky
+ansible xxx -m yum -a "name=httpd state=present"
+ansible xxx -m service -a "name=httpd state=started enabled=true"
+```
+
+Now we can transform the commands into yaml file.
+
+```yaml
+- hosts : xxx
+  remote_user: xxx
+  tasks:
+  - name: install httpd
+	apt: name=httpd state=present
+
+```
+
+
+
+```yaml
+- hosts : xxx
+  remote_user: xxx
+  tasks:
+  - name: install httpd
+	yum: name=httpd state=present
+  - name: start httpd
+    service: name=httpd state=started enabled=true
+```
+
+
+before execution, playbook will first get the fact property. This step is optional. You can add to playbook `gather_facts=no`.
+
+
+## Ansible + yaml
+
+How to deploy and run task flexibly?
+
+* trigger + handler
+* templates
+* tags
+
+Use case:
+based on nginx, meet the following requirements
+
+1. start user: nginx-test, uid is 82, system user, cannot login  -> we can use user
+2. start port 82  -> replace or sed+shell
+3. web file: /data/webserver/html   -> file 
+4. default homepage: index.html  -> file / copy
+5. content: "welcome to ansible" -> sell
+
+We also need service module, installation needs apt / yum module. 
+
+First, we clean the environment
+
+```bash
+ansible web -m shell -a "apt purge nginx nginx-common -y"
+ansible web -m shell -a "apt list --installed | grep nginx"
+```
+
+
+Let's write the ansible playbook
+
+First prepare the nginx.conf
+```
+user nginx-test;
+worker_processes auto;
+pid /run/nginx.pid;
+error_log /var/log/nginx/error.log;
+include /etc/nginx/modules-enabled/*.conf;
+events {
+        worker_connections 768;
+}
+http {
+        sendfile on;
+        tcp_nopush on;
+        types_hash_max_size 2048;
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        ssl_prefer_server_ciphers on;
+        access_log /var/log/nginx/access.log;
+        gzip on;
+        include /etc/nginx/conf.d/*.conf;
+        include /etc/nginx/sites-enabled/*;
+}
+```
+
+
+Next let's write nginx-define.conf for server configuration
+```
+server {
+  listen 10086;
+  root        /data/server/html;
+  location / {
+  }
+}
+
+```
+
+
+finally let's start with ansible
+```yaml
+- hosts: web
+  remote_user: root
+  tasks:
+    - name: create new user
+      user: name=nginx-test system=yes uid=82 shell=/sbin/nologin
+    - name: create web root
+      file: name=/data/webserver/html owner=nginx-test state=directory
+    - name: touch web index
+      shell: echo '<h1>welcome to ansible</h1>' > /data/webserver/html/index.html
+    - name: install package
+      apt: name=nginx state=present
+    - name: copy config
+      copy: src=nginx.conf dest=/etc/nginx/nginx.conf
+    - name: copy subconfig
+      copy: src=nginx-define.conf dest=/etc/nginx/conf.d
+    - name: start service
+      service: name=nginx state=started e
+```
+
+
+## Ansible interruption
+By default, if one task failed, the tasks after it will also fail.
+
+What if, an unimportant task was interrupted, and I want to resume?
+
+Two ways 1. skip 2. ignore
+
+add this to playbook
+
+```yaml
+ignore_erros: true	
+```
+
+## Trgger / Tags
+We have chosen to let nginx listen to 10086. However, the systemd needs to reload the config to apply change. How do we set up a trigger such that one the config file is changed, it will be reflected in systemd service?
+
+We use notify and handler module to do it
+
+We can define the following ansible playbook
+
+```yaml
+- hosts: web
+  remote_user: root
+  tasks:
+    - name: create new user
+      user: name=nginx-test system=yes uid=82 shell=/sbin/nologin
+    - name: create web root
+      file: name=/data/webserver/html owner=nginx-test state=directory
+    - name: touch web index
+      shell: echo '<h1>welcome to ansible</h1>' > /data/webserver/html/index.html
+    - name: install package
+      apt: name=nginx state=present
+    - name: copy config
+      copy: src=nginx.conf dest=/etc/nginx/nginx.conf
+    - name: copy subconfig
+      copy: src=nginx-define.conf dest=/etc/nginx/conf.d
+      notify: resload nginx
+    - name: start service
+      service: name=nginx state=started enabled=true
+  handlers:
+    - name: reload service
+      service: name=nginx state=reloaded
+```
+
+
+Okay, so we have an automatic trigger, but the question is, there will be useless tasks in the latter. HOw do we skip them?
+
+Use tags, we can seperate steps of insllation with change
+
+```yaml
+- hosts: web
+  remote_user: root
+  tasks:
+    - name: create new user
+      user: name=nginx-test system=yes uid=82 shell=/sbin/nologin
+      tags: installtags
+    - name: create web root
+      file: name=/data/webserver/html owner=nginx-test state=directory
+      tags: installtags
+    - name: touch web index
+      shell: echo '<h1>welcome to ansible</h1>' > /data/webserver/html/index.html
+      tags: installtags
+    - name: install package
+      apt: name=nginx state=present
+      tags: installtags
+    - name: copy config
+      copy: src=nginx.conf dest=/etc/nginx/nginx.conf
+      tags: installtags
+    - name: copy subconfig
+      copy: src=nginx-define.conf dest=/etc/nginx/conf.d
+      notify: reload nginx
+      tags:
+      -  installtags
+      -  changetags
+    - name: start service
+      service: name=nginx state=started enabled=true
+      tags: installtags
+  handlers:
+    - name: reload nginx
+      service: name=nginx state=reloaded
+```
+
+Now you can use
+
+```bash
+ansible-playbook 07-playbook-nginx-multags.yml  --tags installtags # for installation
+```
+
+

@@ -1,0 +1,19 @@
+## Ansible variables
+
+ Scenario: One command run by multiple hosts, the final effect is completely the same
+ 
+ ```bash
+# I just want to modify 10.0.0.12
+ansible web -l 10.0.0.12 -m hostname -a "name=rocky10-12" 
+ ```
+ 
+ Now let's start using the variables
+ 
+ ```yaml
+ 
+- hosts: all
+  remote_user: root
+  tasks:
+    - name: create file
+      file: name=/var/log/var-{{ ansible_fqdn }}.log state=touch owner=daemon
+ ```
