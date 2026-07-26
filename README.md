@@ -247,4 +247,9 @@ Attempt to learn linux and stuff...
 * ansible modules: shell, command, scripts
 * copy, fetch, file, unarchive, archive, get_url module
 * apt, yum, service module
-
+* playbook: tag, handler, exception handling
+* variable: fact, hosts, vars, vars.yaml, -e
+* process: when, with_items, loop
+* config content: {{%if%}}, {{%for%}}
+* role: playbooks divided 
+* 3 scenarios
