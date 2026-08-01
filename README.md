@@ -253,3 +253,10 @@ Attempt to learn linux and stuff...
 * config content: {{%if%}}, {{%for%}}
 * role: playbooks divided 
 * 3 scenarios
+
+
+## 17. OpenVPN & LDAP
+* vpn: use of openvpn
+* server: insall -> deploy -> start service -> iptable
+* ldap: verification in large system
+* ldapadd, ldapmodify, ldapsearch, ldapcat

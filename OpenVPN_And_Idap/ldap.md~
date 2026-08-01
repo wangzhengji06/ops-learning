@@ -1,0 +1,145 @@
+## What is ldap?
+
+LDAP is a protocol used to access and manage directory information, such as users, departments, and groups.
+
+Each person usually has one unique directory entry, identified by a Distinguished Name, or DN:
+
+uid=zhangsan,ou=People,dc=company,dc=com
+
+A user can belong to multiple groups because different group entries can reference the same user DN:
+
+vpn-users  → zhangsan
+developers → zhangsan
+
+So the user record is not duplicated. LDAP simply stores relationships between users and groups.
+
+In enterprise systems, applications such as OpenVPN, OA systems, email, and internal websites can use LDAP to verify a user’s identity and check group membership.
+
+In one sentence:
+
+LDAP is a centralized directory service for managing users, identities, and group relationships.
+
+## Terminology
+
+DIT: directory tree
+
+dc: root
+
+ou: department / group
+
+
+## Deploying ldap
+
+```bash
+
+# these two steps are very important
+hostnamectl set-hostname ldap.magedu.com
+echo "10.0.0.13 ldap.magedu.com" >> /etc/hosts
+
+
+# Install the software
+apt update
+apt install -y slapd ldap-utils
+
+# dc is created by default, now we need to create ou
+vim base.ldif
+
+dn: ou=users,dc=magedu,dc=com
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=magedu,dc=com
+objectClass: organizationalUnit
+ou: groups
+
+# Import the ldif
+ldapadd -x -D cn=admin,dc=magedu,dc=com -w Ldap@123456 -f base.ldif
+
+# create group ou
+vim group.ldif
+
+dn: cn=dev-group,ou=groups,dc=magedu,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: dev-group
+gidNumber: 10001
+
+ldapadd -x -D cn=admin,dc=magedu,dc=com -w Ldap@123456 -f group.ldif
+
+# create user ou
+vim user.ldif
+
+dn: uid=testuser,ou=users,dc=magedu,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: Test User
+sn: User
+uid: testuser
+uidNumber: 10001
+gidNumber: 10001
+homeDirectory: /home/testuser
+loginShell: /bin/bash
+shadowMax: 99999
+shadowMin: 0
+shadowWarning: 7
+userPassword: {SSHA}T8Kvq0U1jqWp+NN+vOxPRt6wvxcEbXR5
+
+ldapadd -x -D cn=admin,dc=magedu,dc=com -w Ldap@123456 -f user.ldif
+```
+
+
+Now you have created the group and user, you can start querying it
+
+```bash
+ldapsearch -x -H ldap://10.0.0.13 -b dc=magedu,dc=com "uid=testuser"
+```
+
+`ldapsearch` is typically used for verifying whether the command was successful. `ldapsearch -x -D user -w Password -b range "(filtered condition)"`
+
+```bash
+ldapwhoami -x -D uid=testuser,ou=users,dc=magedu,dc=com -w admin@123456
+```
+
+This is used to test whether the proper password and username has been assigned already
+
+
+## Installing Client
+
+```bash
+apt install -y libnss-ldapd nslcd ldap-utils
+
+
+vim /etc/pam.d/common-session
+# this would add automatic create home folder option
+session required        pam_mkhomedir.so skel=/etc/skel umask=0022
+# end of pam-auth-update config
+```
+
+
+## Schema
+```bash
+cat > online_disable_misc_fixed.ldif <<-EOF
+dn: cn={4}misc,cn=schema,cn=config
+changetype: modify
+replace: olcObjectClasses
+# 辅助类：保留原有属性，添加合理但严苛的必填属性（MUST cn，实际没有，等效禁用）
+olcObjectClasses: {0}( 2.16.840.1.113730.3.2.147 NAME 'inetLocalMailRecipient'
+DESC 'Internet local mail recipient' SUP top AUXILIARY MUST cn MAY (
+mailLocalAddress $ mailHost $ mailRoutingAddress ) )
+# 结构类：改为ABSTRACT抽象类，无法直接创建条目
+olcObjectClasses: {1}( 1.3.6.1.4.1.42.2.27.1.2.5 NAME 'nisMailAlias' DESC 'NIS
+mail alias' SUP top ABSTRACT MUST cn MAY rfc822MailMember )
+EOF
+
+ldapmodify -Y EXTERNAL -H ldapi:/// -f online_disable_misc_fixed.ldif
+```
+
+LDAP Schema defines what data can be stored in the directory. It specifies valid attributes, value formats, matching rules, and object classes. An object class determines what an entry is and which attributes are required or optional. Multiple compatible object classes, such as inetOrgPerson and posixAccount, can be combined in one entry.
+
+
+## Verification 
+
+LDAP authentication is usually performed through a Bind operation using a DN and password, or through SASL. Passwords may be stored as SSHA hashes, while SSL/TLS protects credentials and LDAP data during transmission. LDAPS uses TLS from the beginning, usually on port 636, while StartTLS upgrades a normal LDAP connection on port 389.
+
+
