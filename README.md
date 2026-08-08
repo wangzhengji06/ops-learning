@@ -2,261 +2,263 @@
 
 Attempt to learn linux and stuff...
 
-
 ## 1. Linux Introduction and Installation
 
-* How to set up the virual machines (Ubuntu, Rocky, OpenEuler)
+- How to set up the virual machines (Ubuntu, Rocky, OpenEuler)
 
-* How to manuipulate Ubuntu.
+- How to manuipulate Ubuntu.
 
-* Basic Computer Architecture
+- Basic Computer Architecture
 
-* API，ABI(POSFIX) 
+- API，ABI(POSFIX)
 
-* snapshot / clone
+- snapshot / clone
 
-* Ubuntu / Rocky Installation
+- Ubuntu / Rocky Installation
 
-* Hostname / IPV4 address 
+- Hostname / IPV4 address
 
-* TTY / User / SHELL / Command
+- TTY / User / SHELL / Command
 
 ## 2. File System
 
-* stat to check
+- stat to check
 
-* inode, softlink, hardlink
+- inode, softlink, hardlink
 
-* IO redirect
+- IO redirect
 
-* user, group
+- user, group
 
-* chown, chmod
+- chown, chmod
 
-* cut find xargs sort uniq
+- cut find xargs sort uniq
 
-* grep sed awk
-
+- grep sed awk
 
 ## 3. Privledge
 
-* File leve privledge: rwx, SUID..., SELINUX, Special Privledge
+- File leve privledge: rwx, SUID..., SELINUX, Special Privledge
 
-* User management: groupadd, groupdel etc....
-
+- User management: groupadd, groupdel etc....
 
 ## 4. Hard Disk
 
-* Parition -> Make format -> Mount
+- Parition -> Make format -> Mount
 
-* Logical Volume: physical volume -> volume group -> logical volume -> make format -> mount
+- Logical Volume: physical volume -> volume group -> logical volume -> make format -> mount
 
-* du / df / dd / lsblk
-
+- du / df / dd / lsblk
 
 ## 5. Software
 
-* yum apt 
+- yum apt
 
-* rpm dpkg
+- rpm dpkg
 
-* software source
+- software source
 
-* systemd management
-
+- systemd management
 
 ## 6. Shell Script
 
-* Execution Order
+- Execution Order
 
-* If condition
+- If condition
 
-* for while until
+- for while until
 
-* continue break exit
+- continue break exit
 
-* function
+- function
 
-* expect, kill, trap
+- expect, kill, trap
 
 ## 7. Process
 
-* pstree, vmstat, iostat, top, ps
+- pstree, vmstat, iostat, top, ps
 
-* vmstat, lsof
+- vmstat, lsof
 
-* at, crontab, bg, fg, jobs, nohup, &
+- at, crontab, bg, fg, jobs, nohup, &
 
-* state: y, m insmod, lsmod, modinfo, modprobe, rmmod
+- state: y, m insmod, lsmod, modinfo, modprobe, rmmod
 
-* sysctl -a -w -p
+- sysctl -a -w -p
 
-* echo > proc/sys/name1/name2/parameter
-
+- echo > proc/sys/name1/name2/parameter
 
 ## 8. Network
 
-* osi, tcp/ip
+- osi, tcp/ip
 
-* tcp port udp 
+- tcp port udp
 
-* ipv4 ipv6 arp icmp
+- ipv4 ipv6 arp icmp
 
-* MAC table
+- MAC table
 
-* hostname / hostnamectl
+- hostname / hostnamectl
 
-* ifconfig / ip addr
+- ifconfig / ip addr
 
-* ifconfig / ip link
+- ifconfig / ip link
 
-* route / ip route
+- route / ip route
 
-* nmcli 
+- nmcli
 
-* bounding / teaming
+- bounding / teaming
 
-* ping / fping / route -n / ip route list / traceroute / tracepath / mtr
+- ping / fping / route -n / ip route list / traceroute / tracepath / mtr
 
-* tcpdump
+- tcpdump
 
 ## 9.Linux server startup process
 
-* The Linux boot process starts with hardware initialization (BIOS/UEFI), hands over control to the bootloader (GRUB) to load the kernel (vmlinuz), which then spawns the first process (systemd) to manage services and finally runs custom scripts (rc.local) before the login shell.
-
+- The Linux boot process starts with hardware initialization (BIOS/UEFI), hands over control to the bootloader (GRUB) to load the kernel (vmlinuz), which then spawns the first process (systemd) to manage services and finally runs custom scripts (rc.local) before the login shell.
 
 ## 10. DNS(Network)
 
-* Domain -> IP address
-* ipv4 root  13 group    ipv6 root 25 group
-* Setup dns server: 1. Change zone file 2. Change record file 3. Check grammar 4. load the configureation 5. dig
-* DNS location assignment: /etc/resolv.conf /etc/hosts
-* resolvctl statistics
-* master-slave dns, reverse dns lookup
-* cdn
+- Domain -> IP address
+- ipv4 root 13 group ipv6 root 25 group
+- Setup dns server: 1. Change zone file 2. Change record file 3. Check grammar 4. load the configureation 5. dig
+- DNS location assignment: /etc/resolv.conf /etc/hosts
+- resolvctl statistics
+- master-slave dns, reverse dns lookup
+- cdn
 
 ## 11. Network Security
 
-* asymmetric, symmetric, hashing
+- asymmetric, symmetric, hashing
 
-* CA certificate [establish, self-issue, server request, CA issue certificate ]
+- CA certificate [establish, self-issue, server request, CA issue certificate ]
 
-* SSL/TLS + HTTP = HTTPS
+- SSL/TLS + HTTP = HTTPS
 
-* ssh root@10.0.0.3 command
+- ssh root@10.0.0.3 command
 
-* scp [-r] source target
+- scp [-r] source target
 
-* ssh without password
+- ssh without password
 
-* chrony service
+- chrony service
 
-* iptables for firewall management
+- iptables for firewall management
 
-* iptables on ip forwarding
+- iptables on ip forwarding
 
-* rsyslog, journaltctl -xeu
+- rsyslog, journaltctl -xeu
 
-* NFS: exportfs, showmount
+- NFS: exportfs, showmount
 
-* rsync: inotify or  sersync
+- rsync: inotify or sersync
 
-  
+## 12. HTTP and Nginx
 
-## 12.  HTTP and Nginx
-
-* httpd protocol
-* apache, tomcat, nginx
-* io model
-* Web, Reverse Proxy, cache, email....
-* installation binary/source
-* master worker / slave worker
-* 3rd party module: donwload module, get same version source code, configure-make, change binary
-* Settings: overall - events - http - server - location
-* virtual hosting: port  server name  default_server
-* nginx log, status, redirect,
-* nginx reversed proxy: proxy_pass, proxy_set_header, level 4 rewrite
-* nginx load balancing
+- httpd protocol
+- apache, tomcat, nginx
+- io model
+- Web, Reverse Proxy, cache, email....
+- installation binary/source
+- master worker / slave worker
+- 3rd party module: donwload module, get same version source code, configure-make, change binary
+- Settings: overall - events - http - server - location
+- virtual hosting: port server name default_server
+- nginx log, status, redirect,
+- nginx reversed proxy: proxy_pass, proxy_set_header, level 4 rewrite
+- nginx load balancing
 
 ## 13. Tomcat
 
-* Config: server / service / connector / engine / host[based on server name]
-* Nginx reverse proxy for tomcat, while tomcat host something like jpress
-* port: 8080(to outside), 8005(management), 8009
-* Session: bond & share
-* JVM basic:  java -> bytes -> class loader -> jvm
-* heap: young(eden from to) / old
-* jvm parameters: -Xms -Xmx ratio...
-* maven: java packaging tool : mvn clean package
-* maven config: /etc/maven/setting.xml / pom.xml
-* nexus: local repo solution
-* Create self-owned repo using nexus
+- Config: server / service / connector / engine / host[based on server name]
+- Nginx reverse proxy for tomcat, while tomcat host something like jpress
+- port: 8080(to outside), 8005(management), 8009
+- Session: bond & share
+- JVM basic: java -> bytes -> class loader -> jvm
+- heap: young(eden from to) / old
+- jvm parameters: -Xms -Xmx ratio...
+- maven: java packaging tool : mvn clean package
+- maven config: /etc/maven/setting.xml / pom.xml
+- nexus: local repo solution
+- Create self-owned repo using nexus
 
- 
 ## 14. MySQL
 
-* database structure
-* Relational database
-* database, table, index, user, function, process, view
-* Use binary / source code for single/mutiple instances for mysql/mariadb
-* Final Environment: Client / Server
-* SQL statement: DDL, DCL, DML, DQL, TCL
-* SQL statement format: SELECT / WHERE / FROM / ;\G / 
-* show, create, drop, alter
-* SQL statement
-* User Management
-* Engine, Index
-* transaction: ACID, repetable read, read uncommited, serialization, dirty read....
-* log: transaction log -> undo / rdo. Error log. General log. Binary log.
-* Backup and Recovery: Physical backup / incremental backup etc...
-* source and replica: how to deploy, master needs an account, and sqldump the data
-* replica needs import data, modify the command, start the replica
-* logic: client changes master, records to binlog
-* replica starts io thread to connect to master
-* master starts the dump thread and goes to binlog pos
-* replica records the data into relay log
-* replica starts sql thread and read commands from relay log and hand it to mysql to execute
-* finally master and slave have the same contents
-* cluster: binlog + manual / GTID
-* middleware: backend and mysql bridge
-* high availability: MGR clusters
-
-
+- database structure
+- Relational database
+- database, table, index, user, function, process, view
+- Use binary / source code for single/mutiple instances for mysql/mariadb
+- Final Environment: Client / Server
+- SQL statement: DDL, DCL, DML, DQL, TCL
+- SQL statement format: SELECT / WHERE / FROM / ;\G /
+- show, create, drop, alter
+- SQL statement
+- User Management
+- Engine, Index
+- transaction: ACID, repetable read, read uncommited, serialization, dirty read....
+- log: transaction log -> undo / rdo. Error log. General log. Binary log.
+- Backup and Recovery: Physical backup / incremental backup etc...
+- source and replica: how to deploy, master needs an account, and sqldump the data
+- replica needs import data, modify the command, start the replica
+- logic: client changes master, records to binlog
+- replica starts io thread to connect to master
+- master starts the dump thread and goes to binlog pos
+- replica records the data into relay log
+- replica starts sql thread and read commands from relay log and hand it to mysql to execute
+- finally master and slave have the same contents
+- cluster: binlog + manual / GTID
+- middleware: backend and mysql bridge
+- high availability: MGR clusters
 
 ## 15. LVS + Keepalived
-* Mode: NAT, DR, TUN
-* NAT needs to go through LVS to respond, so it is relatively slow
-* DR changes MAC address RS needs vip
-* TUN use ip-in-ip protocol. RS needs vip and the ability to handle nonstandard packet.
-* ipvsadm command. service use Uppercase Letter, server use Lowercase Letter.
-* lvs (rs needs vip and arp config for dr mode)
-* clustering basis: time synchornization / vrrp protocol
-* keepalived: high availability + high extension
-* can be used alone or add other high extension software(nginx, HAProxy)
-* keepalived: global / high avalability / high extension
-* virtual server: real_server many ways to check heartbeat: http, tcp
-* keepalived basically allows you to check vrrp's other lvs server state using customized way also
-* keepalived itself vs keepalived + nginx 
-* vrrp scripts + track scripts
 
+- Mode: NAT, DR, TUN
+- NAT needs to go through LVS to respond, so it is relatively slow
+- DR changes MAC address RS needs vip
+- TUN use ip-in-ip protocol. RS needs vip and the ability to handle nonstandard packet.
+- ipvsadm command. service use Uppercase Letter, server use Lowercase Letter.
+- lvs (rs needs vip and arp config for dr mode)
+- clustering basis: time synchornization / vrrp protocol
+- keepalived: high availability + high extension
+- can be used alone or add other high extension software(nginx, HAProxy)
+- keepalived: global / high avalability / high extension
+- virtual server: real_server many ways to check heartbeat: http, tcp
+- keepalived basically allows you to check vrrp's other lvs server state using customized way also
+- keepalived itself vs keepalived + nginx
+- vrrp scripts + track scripts
 
 ## 16.Ansible
-* automatic devops tool[I
-* python + yaml + jinja2
-* config: hosts file + ssh no-password login
-* ansible modules: shell, command, scripts
-* copy, fetch, file, unarchive, archive, get_url module
-* apt, yum, service module
-* playbook: tag, handler, exception handling
-* variable: fact, hosts, vars, vars.yaml, -e
-* process: when, with_items, loop
-* config content: {{%if%}}, {{%for%}}
-* role: playbooks divided 
-* 3 scenarios
 
+- automatic devops tool[I
+- python + yaml + jinja2
+- config: hosts file + ssh no-password login
+- ansible modules: shell, command, scripts
+- copy, fetch, file, unarchive, archive, get_url module
+- apt, yum, service module
+- playbook: tag, handler, exception handling
+- variable: fact, hosts, vars, vars.yaml, -e
+- process: when, with_items, loop
+- config content: {{%if%}}, {{%for%}}
+- role: playbooks divided
+- 3 scenarios
 
 ## 17. OpenVPN & LDAP
-* vpn: use of openvpn
-* server: insall -> deploy -> start service -> iptable
-* ldap: verification in large system
-* ldapadd, ldapmodify, ldapsearch, ldapcat
+
+- vpn: use of openvpn
+- server: insall -> deploy -> start service -> iptable
+- ldap: verification in large system
+- ldapadd, ldapmodify, ldapsearch, ldapcat
+- acl privledge control
+- copy cluster
+- ansible intergration
+
+## 18. Zabbix
+
+- monitoring software
+- agent, ssh, SNMP, IPMI
+- linux command, open source software, monitoring platform
+- zabbix server: zabbix-server, mysql, nginx/php, zabbix-get
+- zabbix-client: zabbix-agent, zabbix-java-gateway+java(JMX)
+- agent collect data, server recieve data, mysql get data, nginx use php to get data from mysql
+- item customization: demand analysis -> linux command write item -> restart agent -> local test and remote test -> on server, add host and add item
