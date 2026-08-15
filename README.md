@@ -262,3 +262,9 @@ Attempt to learn linux and stuff...
 - zabbix-client: zabbix-agent, zabbix-java-gateway+java(JMX)
 - agent collect data, server recieve data, mysql get data, nginx use php to get data from mysql
 - item customization: demand analysis -> linux command write item -> restart agent -> local test and remote test -> on server, add host and add item
+- hosts mintoring core functions: graph, dashboard, trigger, template
+- zabbix user privlege control: user group, host group
+- grafana for visualization
+- Montior: trigger -> action
+- Alert: server, script, zabbix integration, media
+- remote recovery: sudo, agent running command, agent config
