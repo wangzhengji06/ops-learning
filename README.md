@@ -268,3 +268,4 @@ Attempt to learn linux and stuff...
 - Montior: trigger -> action
 - Alert: server, script, zabbix integration, media
 - remote recovery: sudo, agent running command, agent config
+- Active and Passive

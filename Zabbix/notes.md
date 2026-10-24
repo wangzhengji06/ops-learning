@@ -357,3 +357,54 @@ Add the sudoer at the same time also.
 Active mode means client actively transfer data to server.
 
 Why must I accept? Only if the hostname MATCH!
+
+
+### How to enable active mode?
+ 
+1. Recieve data
+2. Set up rule: Check hostname, Add host, link template
+ 
+### How to enable automatic discovery?
+
+THis is used for passive mode, what it does is the zabbix server asks for the hostname, and automaitcally register them.
+
+
+## Distributed monitoring
+Why might zabbix needs proxy? Two reasons 1. Too many servers, we need to reduce the pressure for zabbix server 2. Zabbix server cannot directly connect to the client hosts.
+
+proxy can also use active or passive mode, agent can use active or passive mode, the zabbix server can do active report or automatice discovery on proxy, and there are 3 ways of encryption, so 24 modes in total...
+
+The set up is really simple, so I will just omit it...
+
+
+## Zabbix API
+You dont have to click you know?
+You can connect to zabbix, get the verification information, then dpeneds on the target, you post on its api. 
+
+If it is LAMP: http://10.0.0.13/zabbix/api_jsonrpc.php
+
+If it is LNMP: http://10.0.0.13/api_jsonrpc.php
+
+How to get verification information?
+
+The example as below
+
+```bash
+curl --request POST \
+  --url 'http://10.0.0.13/api_jsonrpc.php' \
+  --header 'Content-Type: application/json-rpc' \
+  --data '{"jsonrpc":"2.0","method":"user.login","params": {"username":"Admin","password":"zabbix"},"id":1}'
+```
+
+Don't ever write it by yourself, always copy and paste.
+
+
+## Zabbix High Availability
+Zabbix provided a keep-alived like way of providing high availbality. it has a default channel to connect, and is non preemptive, and is keep doing unicast.
+
+What we need to do is to install zabbix server, and also prepare for an account for mysql that allows the host to connect.
+
+`zabbix_server -R ha_status` can be used to check the current status.
+
+Of course because it is non preemptive mode, so if the master is dead, then slave will keep working, even after the master is restored. 
+
