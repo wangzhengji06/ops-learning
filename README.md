@@ -269,3 +269,8 @@ Attempt to learn linux and stuff...
 - Alert: server, script, zabbix integration, media
 - remote recovery: sudo, agent running command, agent config
 - Active and Passive
+
+## 19. KVM
+
+* different virtualization type: full, half, hardware-accelerated
+* how to install kvm, virsh,virt-install, virt-cl
